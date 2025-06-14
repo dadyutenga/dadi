@@ -46,13 +46,12 @@ public class LeaderboardService {
         // Calculate total score and time from answers
         int totalScore = submission.getAnswers() != null ? 
                 submission.getAnswers().stream()
-                        .mapToInt(answer -> answer.getScore() != null ? answer.getScore() : 0)
+                        .mapToInt(answer -> answer.getPointsAwarded() != null ? answer.getPointsAwarded() : 0)
                         .sum() : 0;
         
-        int totalTimeSeconds = submission.getAnswers() != null ?
-                submission.getAnswers().stream()
-                        .mapToInt(answer -> answer.getTimeTakenSeconds() != null ? answer.getTimeTakenSeconds() : 0)
-                        .sum() : 0;
+        // Use the submission's submittedAt time to calculate time taken
+        int totalTimeSeconds = submission.getTimeTakenSeconds() != null ? 
+                submission.getTimeTakenSeconds().intValue() : 0;
 
         // Find existing leaderboard entry or create new one
         LeaderboardEntry entry = leaderboardRepository.findByUserAndQuiz(submission.getUser(), submission.getQuiz())

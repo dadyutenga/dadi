@@ -39,14 +39,24 @@ public class AnswerService {
         if (!existingAnswers.isEmpty()) {
             // Update existing answer (assuming one answer per submission and question)
             Answer current = existingAnswers.get(0);
-            current.setSelectedOption(answer.getSelectedOption());
-            current.setAnswerText(answer.getAnswerText());
-            current.setScore(answer.getScore());
+            if (answer.getSelectedOption() != null) {
+                current.setSelectedOption(answer.getSelectedOption());
+                current.setIsCorrect(answer.getSelectedOption().isCorrect());
+            }
+            if (answer.getAnswerText() != null) {
+                current.setAnswerText(answer.getAnswerText());
+            }
+            if (answer.getPointsAwarded() != null) {
+                current.setPointsAwarded(answer.getPointsAwarded());
+            }
             return answerRepository.save(current);
         } else {
             // Create new answer
             answer.setSubmission(submission);
             answer.setQuestion(question);
+            if (answer.getSelectedOption() != null) {
+                answer.setIsCorrect(answer.getSelectedOption().isCorrect());
+            }
             return answerRepository.save(answer);
         }
     }

@@ -67,7 +67,7 @@ public class SubmissionService {
         return submissionRepository.findByQuiz(quiz);
     }
 
-    public Optional<Submission> findByUserAndQuiz(Long userId, Long quizId) {
+    public List<Submission> findByUserAndQuiz(Long userId, Long quizId) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         Quiz quiz = quizService.findById(quizId)
