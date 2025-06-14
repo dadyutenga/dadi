@@ -67,12 +67,4 @@ public class UserService implements UserDetailsService {
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
-
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
 }
