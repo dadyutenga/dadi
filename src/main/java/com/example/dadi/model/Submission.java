@@ -97,4 +97,9 @@ public class Submission {
         answers.remove(answer);
         answer.setSubmission(null);
     }
+
+    public Object getSubmissionTime() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSubmissionTime'");
+    }
 }

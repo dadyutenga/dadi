@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Test Platform</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #358927 0%, #D7E050 100%);
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+        .header {
+            text-align: center;
+            padding: 50px 20px;
+            animation: fadeIn 2s ease-in;
+        }
+        .header h1 {
+            font-size: 3.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .content {
+            text-align: center;
+            padding: 20px;
+            animation: slideUp 1.5s ease-out;
+        }
+        .content p {
+            font-size: 1.3em;
+            margin: 20px 0;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .details {
+            font-size: 1em;
+            margin: 20px 0;
+            opacity: 0.8;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .btn {
+            background-color: #fff;
+            color: #358927;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn.admin {
+            background-color: #358927;
+            color: #D7E050;
+        }
+        .btn.admin:hover {
+            background-color: #2d6f1f;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Online Test Platform</h1>
+    </div>
+    <div class="content">
+        <p>Welcome to your cutting-edge online testing solution. Prepare, practice, and excel with our modern platform designed for students, professionals, and educators worldwide.</p>
+        <div class="details">
+            <p></p>
+        </div>
+        <div class="buttons">
+            <button class="btn">Start as Test Taker</button>
+            <button class="btn admin">Login as Admin</button>
+        </div>
+    </div>
+</body>
+</html>
