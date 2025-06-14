@@ -2,17 +2,20 @@ package com.example.dadi.service;
 
 import com.example.dadi.model.User;
 import com.example.dadi.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -22,7 +25,14 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(User user) {
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .or(() -> userRepository.findByUsername(username))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email: " + username));
+    }
+
+    public User registerUser(User user, String role) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already in use!");
         }
@@ -30,6 +40,7 @@ public class UserService {
             throw new RuntimeException("Username already taken!");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(User.Role.valueOf(role));
         return userRepository.save(user);
     }
 

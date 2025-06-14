@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - DADI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #358927;
+            --primary-hover: #2a6e1f;
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(53, 137, 39, 0.1);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-card h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .welcome-card p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        .welcome-card .icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 5rem;
+            opacity: 0.1;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .stats-card h3 {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+        .recent-activity {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+        .activity-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(53, 137, 39, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        .activity-icon i {
+            color: var(--primary-color);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 p-0 sidebar">
+                <div class="sidebar-header">
+                    <h5 class="mb-0">DADI</h5>
+                </div>
+                <div class="sidebar-menu">
+                    <a href="/user/dashboard" class="active">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="/user/profile">
+                        <i class="bi bi-person"></i> My Profile
+                    </a>
+                    <a href="/user/orders">
+                        <i class="bi bi-cart"></i> My Orders
+                    </a>
+                    <a href="/user/settings">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <!-- Top Bar -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Dashboard</h4>
+                    <div class="dropdown">
+                        <a class="btn btn-light dropdown-toggle d-flex align-items-center" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:src="${#authentication.principal.avatar != null} ? ${#authentication.principal.avatar} : 'https://ui-avatars.com/api/?name=' + ${#authentication.principal.username} + '&background=358927&color=fff'" alt="User" class="user-avatar me-2">
+                            <span sec:authentication="name">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/user/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/user/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/auth/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Welcome Card -->
+                <div class="welcome-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2>Welcome back, <span sec:authentication="name">User</span>!</h2>
+                            <p>Here's what's happening with your account today.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <i class="bi bi-gem icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <i class="bi bi-cart"></i>
+                            <h3>12</h3>
+                            <p class="text-muted">Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <i class="bi bi-star"></i>
+                            <h3>48</h3>
+                            <p class="text-muted">Reward Points</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <i class="bi bi-bell"></i>
+                            <h3>3</h3>
+                            <p class="text-muted">Notifications</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="recent-activity">
+                            <h5 class="mb-4">Recent Activity</h5>
+                            <div class="activity-item d-flex">
+                                <div class="activity-icon">
+                                    <i class="bi bi-cart-check"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Order #12345 Delivered</h6>
+                                    <p class="text-muted mb-0">Your order has been successfully delivered</p>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item d-flex">
+                                <div class="activity-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Payment Received</h6>
+                                    <p class="text-muted mb-0">Payment of $129.99 received for order #12345</p>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item d-flex">
+                                <div class="activity-icon">
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">New Reward Earned</h6>
+                                    <p class="text-muted mb-0">You've earned 10 reward points</p>
+                                    <small class="text-muted">2 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <h5>Quick Actions</h5>
+                            <a href="/user/orders/new" class="btn btn-primary w-100 mb-2">
+                                <i class="bi bi-plus-lg me-2"></i>New Order
+                            </a>
+                            <a href="/user/support" class="btn btn-outline-secondary w-100 mb-2">
+                                <i class="bi bi-headset me-2"></i>Support
+                            </a>
+                            <a href="/user/settings" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-gear me-2"></i>Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{/auth/logout}" method="post">
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

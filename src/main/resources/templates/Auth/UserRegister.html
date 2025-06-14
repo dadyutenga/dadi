@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - DADI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        .register-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.08);
+        }
+        .form-control:focus {
+            border-color: #358927;
+            box-shadow: 0 0 0 0.25rem rgba(53, 137, 39, 0.15);
+        }
+        .btn-primary {
+            background-color: #358927;
+            border-color: #358927;
+            padding: 0.6rem;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #2a6e1f;
+            border-color: #2a6e1f;
+        }
+        .form-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .password-requirements {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+        .requirement i {
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .valid {
+            color: #198754;
+        }
+        .invalid {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-container">
+            <div class="text-center mb-4">
+                <h2>Create Your Account</h2>
+                <p class="text-muted">Join DADI today and start your journey</p>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}" role="alert"></div>
+            
+            <form th:action="@{/auth/user/register}" th:object="${user}" method="post" id="registerForm" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                        <div class="invalid-feedback">Please enter your first name.</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                        <div class="invalid-feedback">Please enter your last name.</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text">@</span>
+                        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                    </div>
+                    <div class="invalid-feedback">Please choose a username.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                    <div class="invalid-feedback">Please provide a valid email.</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                        <div class="password-requirements">
+                            <div class="requirement" id="length">
+                                <i class="bi bi-circle"></i> At least 8 characters
+                            </div>
+                            <div class="requirement" id="uppercase">
+                                <i class="bi bi-circle"></i> At least one uppercase letter
+                            </div>
+                            <div class="requirement" id="number">
+                                <i class="bi bi-circle"></i> At least one number
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                        <div class="invalid-feedback">Passwords must match.</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                    </label>
+                    <div class="invalid-feedback">You must agree to the terms and conditions.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mt-3">Create Account</button>
+                
+                <div class="text-center mt-3">
+                    <p class="mb-0">Already have an account? <a th:href="@{/auth/user/login}" class="text-decoration-none fw-bold">Sign in</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Form validation and password strength checker
+    (function () {
+        'use strict'
+        
+        const form = document.getElementById('registerForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        // Password requirements check
+        function checkPassword() {
+            const value = password.value;
+            const length = value.length >= 8;
+            const hasUpper = /[A-Z]/.test(value);
+            const hasNumber = /[0-9]/.test(value);
+            
+            // Update icons
+            document.getElementById('length').className = `requirement ${length ? 'valid' : 'invalid'}`;
+            document.getElementById('uppercase').className = `requirement ${hasUpper ? 'valid' : 'invalid'}`;
+            document.getElementById('number').className = `requirement ${hasNumber ? 'valid' : 'invalid'}`;
+            
+            // Update icons with check/x
+            document.getElementById('length').innerHTML = 
+                `<i class="bi ${length ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i> At least 8 characters`;
+            document.getElementById('uppercase').innerHTML = 
+                `<i class="bi ${hasUpper ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i> At least one uppercase letter`;
+            document.getElementById('number').innerHTML = 
+                `<i class="bi ${hasNumber ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i> At least one number`;
+        }
+        
+        // Check passwords match
+        function checkPasswordsMatch() {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity("Passwords do not match");
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        }
+        
+        // Event listeners
+        password.addEventListener('input', checkPassword);
+        confirmPassword.addEventListener('input', checkPasswordsMatch);
+        
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            checkPasswordsMatch();
+            form.classList.add('was-validated');
+        }, false);
+    })();
+    </script>
+</body>
+</html>

@@ -1,24 +1,20 @@
 package com.example.dadi.config;
 
-import com.example.dadi.model.User;
 import com.example.dadi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.Collections;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -27,76 +23,69 @@ public class SecurityConfig {
     private final UserService userService;
 
     @Autowired
-    public SecurityConfig(@Lazy UserService userService) {
+    public SecurityConfig(UserService userService) {
         this.userService = userService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/auth/**").permitAll()
-                .requestMatchers("/seeker/**").hasRole("SEEKER")
-                .requestMatchers("/poster/**").hasRole("POSTER")
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/", "/welcome", "/css/**", "/js/**", "/images/**",
+                    "/auth/**"
+                ).permitAll()
+                .requestMatchers(
+                    "/admin/**"
+                ).hasRole("ADMIN")
+                .requestMatchers(
+                    "/user/**"
+                ).hasRole("USER")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginProcessingUrl("/login")
-                .successHandler((request, response, authentication) -> {
-                    String role = authentication.getAuthorities().stream()
-                            .findFirst()
-                            .map(grantedAuthority -> grantedAuthority.getAuthority().replace("ROLE_", ""))
-                            .orElse("");
-                    if (role.equals("SEEKER")) {
-                        response.sendRedirect("/seeker/dashboard");
-                    } else if (role.equals("POSTER")) {
-                        response.sendRedirect("/poster/dashboard");
-                    } else {
-                        response.sendRedirect("/");
-                    }
-                })
-                .failureUrl("/auth/seeker/login?error=true")
+                .loginPage("/auth/select-role")
+                .loginProcessingUrl("/auth/authenticate")
+                .successHandler(authenticationSuccessHandler())
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutUrl("/auth/logout")
+                .logoutSuccessUrl("/?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
-            );
+            )
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/access-denied")
+            )
+            .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            User user = userService.findByEmail(username);
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found");
-            }
-            return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
-            );
-        };
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
+        handler.setDefaultTargetUrl("/auth/redirect");
+        return handler;
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setUserDetailsService(userService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-} 
+}

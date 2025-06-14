@@ -1,12 +1,15 @@
 package com.example.dadi.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.*;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,7 +20,7 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
     
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String username;
     
     @Enumerated(EnumType.STRING)
@@ -27,6 +30,32 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Submission> submissions = new ArrayList<>();
     
+    // UserDetails methods
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     // Constructors
     public User() {
     }
@@ -55,6 +84,8 @@ public class User {
         this.email = email;
     }
 
+    
+    @Override
     public String getPassword() {
         return password;
     }
@@ -64,6 +95,7 @@ public class User {
     }
 
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -71,6 +103,7 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
 
     public Role getRole() {
         return role;
@@ -98,7 +131,8 @@ public class User {
         submission.setUser(null);
     }
     
+    // Role enum
     public enum Role {
-        ADMIN, USER
+        USER, ADMIN
     }
 }

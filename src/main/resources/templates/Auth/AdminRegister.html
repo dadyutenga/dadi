@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration - DADI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .register-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-control:focus {
+            border-color: #358927;
+            box-shadow: 0 0 0 0.25rem rgba(53, 137, 39, 0.25);
+        }
+        .btn-primary {
+            background-color: #358927;
+            border-color: #358927;
+        }
+        .btn-primary:hover {
+            background-color: #2a6e1f;
+            border-color: #2a6e1f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-container">
+            <h2 class="text-center mb-4">Admin Registration</h2>
+            
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            
+            <form th:action="@{/auth/admin/register}" th:object="${user}" method="post" id="registerForm" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                        <div class="invalid-feedback">Please choose a username.</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                        <div class="invalid-feedback">Please provide a valid email.</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                        <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                        <div class="invalid-feedback">Passwords must match.</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="adminKey" class="form-label">Admin Key</label>
+                    <input type="password" class="form-control" id="adminKey" name="adminKey" required>
+                    <div class="form-text">Enter the admin key provided by the system administrator.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">Register as Admin</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <p>Already have an account? <a th:href="@{/auth/admin/login}" class="text-decoration-none">Login here</a></p>
+                <a th:href="@{/}" class="text-decoration-none">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Form validation
+    (function () {
+        'use strict'
+        
+        const form = document.getElementById('registerForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Check if passwords match
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity("Passwords do not match");
+                event.preventDefault();
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    })();
+    </script>
+</body>
+</html>
